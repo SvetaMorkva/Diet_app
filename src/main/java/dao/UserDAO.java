@@ -3,16 +3,11 @@ package dao;
 import entity.User;
 import idao.IDaoUser;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO extends DAOBase<User> implements IDaoUser {
-
-    public UserDAO(Connection _connection)  {
-        super(_connection);
-    }
 
     public List<User> findAll() {
         List<User> users = new ArrayList<>();;
@@ -35,42 +30,46 @@ public class UserDAO extends DAOBase<User> implements IDaoUser {
     }
 
     public User findById(Long userId) {
-        User entity = new User();
         try {
+            User entity = new User();
             String queryString = "SELECT * FROM " + entity.getTableName() +
                     " WHERE " + entity.getIdName() + "=?";
             System.out.println(queryString);
             var ptmt = connection.prepareStatement(queryString);
             ptmt.setLong(1, userId);
             var resultSet = ptmt.executeQuery();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 entity.parse(resultSet);
+                return entity;
             }
+            return null;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             cleanUp();
         }
-        return entity;
+        return null;
     }
 
     public User findByLogin(String login) {
-        User entity = new User();
         try {
+            User entity = new User();
             String queryString = "SELECT * FROM " + entity.getTableName() +
                     " WHERE " + "LoginName=?";
             System.out.println(queryString);
             var ptmt = connection.prepareStatement(queryString);
             ptmt.setString(1, login);
             var resultSet = ptmt.executeQuery();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 entity.parse(resultSet);
+                return entity;
             }
+            return null;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             cleanUp();
         }
-        return entity;
+        return null;
     }
 }

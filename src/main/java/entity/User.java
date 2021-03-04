@@ -22,6 +22,13 @@ public class User extends EntityBase {
         PasswordHash = pass;
     }
 
+    public User(String login, String pass, Integer weight, Integer height) {
+        Login = login;
+        PasswordHash = pass;
+        Weight = weight;
+        Height = height;
+    }
+
     @Override
     public String getTableName() {
         return "user";

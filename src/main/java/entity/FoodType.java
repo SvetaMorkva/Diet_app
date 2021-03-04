@@ -1,5 +1,6 @@
 package entity;
 
+import com.mysql.jdbc.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,16 +12,28 @@ import java.sql.SQLException;
 @NoArgsConstructor
 public class FoodType extends EntityBase {
     Long foodId;
-    String Name;
+    String Name = "";
     Integer Protein = 0;
     Integer Fats = 0;
     Integer Carbs = 0;
     Integer Calories = 0;
 
-    public FoodType(Long id, String name) {
-        foodId = id;
+    public FoodType(String name, String protein, String fats, String calories,
+                    String carbs) {
+        if (StringUtils.isNullOrEmpty(name) || StringUtils.isNullOrEmpty(protein) || StringUtils.isNullOrEmpty(fats)
+                || StringUtils.isNullOrEmpty(calories) || StringUtils.isNullOrEmpty(carbs)) {
+            return;
+        }
         Name = name;
+        Protein = Integer.parseInt(protein);
+        Fats = Integer.parseInt(fats);
+        Calories = Integer.parseInt(calories);
+        Carbs = Integer.parseInt(carbs);
     }
+
+    public boolean isValid() {
+        return !Name.isEmpty() && Protein >= 0 && Fats >= 0 && Carbs >= 0 && Calories >= 0;
+     }
 
     @Override
     public String getTableName() {
@@ -41,7 +54,7 @@ public class FoodType extends EntityBase {
 
     @Override
     public String getIdName() {
-        return "foodId";
+        return "FoodTypeID";
     }
 
     @Override

@@ -9,16 +9,14 @@ import java.sql.SQLException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserDAOTest {
-    Connection connection = null;
     UserDAO userDao = null;
     User user = null;
 
     @BeforeAll
     void setup() throws SQLException {
-        connection = ConnectionFactory.getInstance().getConnection();
 
         user = new User("Somebody", "Sth");
-        userDao = new UserDAO(connection);
+        userDao = new UserDAO();
         userDao.add(user);
     }
 
@@ -57,8 +55,5 @@ class UserDAOTest {
     void close() throws SQLException {
         var user = userDao.findByLogin("Somebody");
         userDao.delete(user);
-        if (connection != null) {
-            connection.close();
-        }
     }
 }

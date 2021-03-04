@@ -5,7 +5,7 @@ import entity.EntityBase;
 import java.util.List;
 
 public interface IDaoBase<T extends EntityBase> {
-    void add(T t);
+    Long add(T t);
     void update(T t);
     void delete(T t);
 

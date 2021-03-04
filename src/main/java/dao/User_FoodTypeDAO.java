@@ -1,36 +1,45 @@
 package dao;
 
-import entity.EntityBase;
 import entity.User_FoodType;
-import idao.IDaoBase;
 
-import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class User_FoodTypeDAO implements IDaoBase<User_FoodType> {
-    DAOBase<User_FoodType> daoBase;
-
-    public User_FoodTypeDAO(Connection _connection) {
-        daoBase = new DAOBase<>(_connection);
+public class User_FoodTypeDAO extends DAOBase<User_FoodType> {
+    public List<Long> findAllForUser(Long userId) {
+        List<Long> foods = new ArrayList<>();;
+        try {
+            User_FoodType foodData = new User_FoodType();
+            String queryString = "SELECT * FROM " + foodData.getTableName() + " WHERE User=?";
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setLong(1, userId);
+            var resultSet = ptmt.executeQuery();
+            while (resultSet.next()) {
+                foods.add(resultSet.getLong("FoodType"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            cleanUp();
+        }
+        return foods;
     }
 
-    public void add(User_FoodType user_foodType) {
-        daoBase.add(user_foodType);
-    }
-
-    public void update(User_FoodType user) {
-        daoBase.update(user);
-    }
-
-    public void delete(User_FoodType user) {
-        daoBase.delete(user);
-    }
-
-    public List<User_FoodType> findAll() {
-        return daoBase.findAll();
-    }
-
-    public User_FoodType findById(Long user_foodTypeId) {
-        return (User_FoodType)daoBase.findById(user_foodTypeId);
+    public int removeUserFoodType(Long userId, Long foodId) {
+        try {
+            User_FoodType foodData = new User_FoodType();
+            String queryString = "DELETE FROM " + foodData.getTableName() +
+                    " WHERE User=? AND FoodType=?";
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setLong(1, userId);
+            ptmt.setLong(2, foodId);
+            return ptmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            cleanUp();
+        }
+        return 0;
     }
 }

@@ -1,5 +1,6 @@
 package dao;
 
+import entity.ConnectionFactory;
 import entity.EntityBase;
 import idao.IDaoBase;
 import lombok.Data;
@@ -16,23 +17,34 @@ public class DAOBase<T extends EntityBase> implements IDaoBase<T> {
     PreparedStatement ptmt = null;
     ResultSet resultSet = null;
 
-    public DAOBase(Connection _connection) {
-        connection = _connection;
+    public DAOBase() {
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void add(T t) {
+    public Long add(T t) {
         try {
             String queryString = t.getInsertQuery();
             ptmt = connection.prepareStatement(queryString);
             t.serialize(ptmt, false);
             ptmt.executeUpdate();
+            queryString = "SELECT LAST_INSERT_ID();";
+            ptmt = connection.prepareStatement(queryString);
+            resultSet = ptmt.executeQuery();
             System.out.println("Element Added Successfully in Table " + t.getTableName());
+            if (resultSet.next()) {
+                return resultSet.getLong("LAST_INSERT_ID()");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             cleanUp();
         }
+        return 0L;
     }
 
     @Override
@@ -80,6 +92,9 @@ public class DAOBase<T extends EntityBase> implements IDaoBase<T> {
             }
             if (ptmt != null) {
                 ptmt.close();
+            }
+            if (connection != null) {
+                connection.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
